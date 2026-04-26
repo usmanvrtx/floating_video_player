@@ -1,0 +1,26 @@
+name: floating_video_player
+description: A reusable floating video player package for Flutter. Supports
+  YouTube-style picture-in-picture, drag-to-mini, snap-to-corner, and
+  portrait/landscape orientation handling.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.10.1
+  chewie: ^1.13.1
+  animate_do: ^4.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+
+flutter:
+  uses-material-design: true
