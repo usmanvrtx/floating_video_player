@@ -24,32 +24,14 @@ A Flutter package that provides a **YouTube-style floating video player** — ex
 
 ## Demo
 
-Place the GIF files in the `docs/gifs/` directory:
-
 ### Expanded → Collapsed Transition
-![Expand-collapse demo](docs/gifs/expand-collapse.gif)
+![Expand-collapse demo](doc/gifs/expand-collapse.gif)
 
 ### Mini-Player Drag & Snap
-![Mini-player drag demo](docs/gifs/drag-snap.gif)
+![Mini-player drag demo](doc/gifs/drag-snap.gif)
 
 ### Landscape Mode
-![Landscape mode demo](docs/gifs/landscape.gif)
-
-#### How to record and add GIFs:
-1. **Record** — Use iOS Screen Recorder or Android Studio Emulator to record your screen
-2. **Convert to GIF** — Use FFmpeg:
-   ```bash
-   ffmpeg -i video.mov -vf "fps=10,scale=300:-1" output.gif
-   ```
-3. **Optimize** — Reduce file size with gifsicle:
-   ```bash
-   gifsicle -O3 output.gif -o output.gif
-   ```
-4. **Place in repo** — Move optimized GIFs to `docs/gifs/`:
-   - `docs/gifs/expand-collapse.gif`
-   - `docs/gifs/drag-snap.gif`
-   - `docs/gifs/landscape.gif`
-5. **Commit** — Add to git and push to your repository
+![Landscape mode demo](doc/gifs/landscape.gif)
 
 ---
 
