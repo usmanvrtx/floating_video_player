@@ -337,11 +337,27 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     setCollapseOffsets(_screenSize!);
     if (c.floatingState.value == FloatingState.collapsed &&
         _collapsedPosition != null) {
-      _collapsedPosition = _clampCollapsedPosition(
+      final clamped = _clampCollapsedPosition(
         _collapsedPosition!,
         _screenSize!,
       );
-      _lastCollapsedPosition = _collapsedPosition;
+
+      // Immediately move to the clamped position so there is no single-frame
+      // flicker at the old (out-of-bounds) location.
+      _collapsedPosition = clamped;
+      _lastCollapsedPosition = clamped;
+
+      // Sync the spring controllers so _snapToCorner animates FROM the already
+      // clamped position, not from the previous out-of-bounds position.
+      _snapX.stop();
+      _snapY.stop();
+      _snapX.value = clamped.dx;
+      _snapY.value = clamped.dy;
+
+      // Rebuild immediately so this frame renders the clamped position.
+      setState(() {});
+
+      // Then spring-animate to the nearest corner.
       _snapToCorner(Offset.zero);
     }
   }
