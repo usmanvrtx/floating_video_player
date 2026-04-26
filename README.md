@@ -133,6 +133,51 @@ FloatingViewController(
 
 ---
 
+## Architecture: Overlay-based system
+
+### Important: The floating player is an overlay, not a widget tree
+
+The floating player is **rendered in Flutter's overlay stack**, not as a child widget in your app's widget tree. This means:
+
+- The player appears **above** all regular widgets, even if you don't nest it in your widget hierarchy
+- It persists across navigation (push/pop) — the player stays visible when you navigate to other screens
+- It renders independently, so it won't be affected by ancestor widget constraints, clipping, or state changes
+- Closing the player removes it from the overlay entirely
+
+This architecture enables the "picture-in-picture" behavior and seamless transitions between expanded, collapsed, and landscape states.
+
+### `OverlayStackManager`
+
+The package includes a singleton `OverlayStackManager` for managing a keyed stack of overlay entries. While the floating player uses this internally, you can also use it directly for your own overlays:
+
+```dart
+// Push a bare overlay
+context.overlayStack.pushOverlay(
+  context,
+  (context) => MyOverlayWidget(),
+  key: 'my_overlay',
+);
+
+// Push a modal overlay with a dismissible barrier
+context.overlayStack.pushModalOverlay(
+  context,
+  (context) => MyDialog(),
+  key: 'my_dialog',
+  barrierColor: Colors.black54,
+  barrierDismissible: true,
+);
+
+// Pop by key
+context.overlayStack.popOverlay('my_overlay');
+
+// Check state
+if (context.overlayStack.isOverlayOpen('my_dialog')) { ... }
+```
+
+Exported as part of the public API via the barrel file.
+
+---
+
 ## `FloatingViewController` parameters
 
 | Parameter | Type | Default | Description |
