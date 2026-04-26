@@ -22,6 +22,37 @@ A Flutter package that provides a **YouTube-style floating video player** — ex
 
 ---
 
+## Demo
+
+Place the GIF files in the `docs/gifs/` directory:
+
+### Expanded → Collapsed Transition
+![Expand-collapse demo](docs/gifs/expand-collapse.gif)
+
+### Mini-Player Drag & Snap
+![Mini-player drag demo](docs/gifs/drag-snap.gif)
+
+### Landscape Mode
+![Landscape mode demo](docs/gifs/landscape.gif)
+
+#### How to record and add GIFs:
+1. **Record** — Use iOS Screen Recorder or Android Studio Emulator to record your screen
+2. **Convert to GIF** — Use FFmpeg:
+   ```bash
+   ffmpeg -i video.mov -vf "fps=10,scale=300:-1" output.gif
+   ```
+3. **Optimize** — Reduce file size with gifsicle:
+   ```bash
+   gifsicle -O3 output.gif -o output.gif
+   ```
+4. **Place in repo** — Move optimized GIFs to `docs/gifs/`:
+   - `docs/gifs/expand-collapse.gif`
+   - `docs/gifs/drag-snap.gif`
+   - `docs/gifs/landscape.gif`
+5. **Commit** — Add to git and push to your repository
+
+---
+
 ## Getting started
 
 Add to your `pubspec.yaml`:
@@ -199,7 +230,7 @@ Exported as part of the public API via the barrel file.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `videoUrl` | `String?` | `null` | URL or file path of the video |
+| `source` | `VideoSource?` | `null` | Video source (network URL, file, asset, or content URI) |
 | `autoPlay` | `bool` | `true` | Start playback automatically |
 | `contentBuilder` | `Widget Function(...)?` | `null` | Scrollable content shown below the player |
 
