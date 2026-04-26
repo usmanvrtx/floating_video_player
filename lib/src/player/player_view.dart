@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../models/floating_state.dart';
-import '../models/video_quality.dart';
 import 'widgets/custom_player_controls.dart';
 
 /// The core video-player widget.
 ///
-/// Handles initialisation, quality/URL changes, playback-speed changes, and the
+/// Handles initialisation, URL changes, playback-speed changes, and the
 /// optional drag-down gesture (used in landscape mode to exit full-screen).
 class PlayerView extends StatefulWidget {
   final String? videoUrl;
-  final VideoQuality? quality;
   final PlayingContentType playingContentType;
   final bool autoPlay;
   final double playbackSpeed;
@@ -29,7 +27,6 @@ class PlayerView extends StatefulWidget {
     required this.floatingState,
     this.playingContentType = PlayingContentType.video,
     this.videoUrl,
-    this.quality,
     this.autoPlay = true,
     this.playbackSpeed = 1.0,
     this.onDragDownThresholdReached,
@@ -78,8 +75,7 @@ class PlayerViewState extends State<PlayerView> {
     final contentTypeChanged =
         widget.playingContentType != oldWidget.playingContentType;
 
-    if (widget.videoUrl != oldWidget.videoUrl ||
-        widget.quality != oldWidget.quality) {
+    if (widget.videoUrl != oldWidget.videoUrl) {
       if (_videoPlayerController != null &&
           _videoPlayerController!.value.isInitialized) {
         _persistentPosition = _videoPlayerController!.value.position;

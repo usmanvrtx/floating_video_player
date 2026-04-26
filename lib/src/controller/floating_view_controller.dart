@@ -4,6 +4,58 @@ import 'package:flutter/services.dart';
 import '../models/floating_state.dart';
 import '../player/floating_player_view.dart';
 
+// ---------------------------------------------------------------------------
+// ViewportInsets
+// ---------------------------------------------------------------------------
+
+/// Extra insets that shrink the usable area for the mini-player.
+///
+/// Set values for any persistent UI chrome that overlaps the screen:
+/// - [bottom] — bottom navigation bar, media player bar, etc.
+/// - [top]    — persistent header/banner below the app bar.
+/// - [left] / [right] — side rails or drawers that are always visible.
+///
+/// All values default to `0`. System insets (status bar, gesture nav bar) are
+/// already accounted for automatically via [MediaQuery.padding].
+///
+/// Example — app has a 56 dp bottom nav bar:
+/// ```dart
+/// controller.updateConstraints(
+///   const ViewportInsets(bottom: kBottomNavigationBarHeight),
+/// );
+/// ```
+class ViewportInsets {
+  final double top;
+  final double bottom;
+  final double left;
+  final double right;
+
+  const ViewportInsets({
+    this.top = 0,
+    this.bottom = 0,
+    this.left = 0,
+    this.right = 0,
+  });
+
+  const ViewportInsets.zero() : top = 0, bottom = 0, left = 0, right = 0;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ViewportInsets &&
+          top == other.top &&
+          bottom == other.bottom &&
+          left == other.left &&
+          right == other.right;
+
+  @override
+  int get hashCode => Object.hash(top, bottom, left, right);
+}
+
+// ---------------------------------------------------------------------------
+// FloatingViewController
+// ---------------------------------------------------------------------------
+
 /// Controls the lifecycle and orientation of the floating video player.
 ///
 /// Obtain an instance from [FloatingViewProvider] and interact with it via the
@@ -20,6 +72,78 @@ class FloatingViewController {
   final ValueNotifier<FloatingState> floatingState = ValueNotifier(
     FloatingState.closed,
   );
+
+  // ── Static layout configuration (set once at construction) ───────────────
+
+  /// Scale of the mini-player relative to screen width. Defaults to `0.45`.
+  final double collapsedScale;
+
+  /// Aspect ratio used for the expanded (portrait) player. Defaults to `16/9`.
+  final double expandedAspectRatio;
+
+  /// Aspect ratio used for the mini-player. Defaults to `16/10`.
+  final double collapsedAspectRatio;
+
+  /// Corner radius of the mini-player. Defaults to `24`.
+  final double collapsedRadius;
+
+  /// Margin that keeps the mini-player away from screen edges.
+  final EdgeInsets collapsedMargin;
+
+  /// Progress fraction [0–1] at which a slow drag commits to collapsing.
+  /// Defaults to `0.35`.
+  final double snapDistanceFactor;
+
+  /// Velocity threshold (in normalised units) above which a fling always
+  /// collapses the player. Defaults to `1.5`.
+  final double snapVelocityThreshold;
+
+  // ── Live viewport constraints ─────────────────────────────────────────────
+
+  /// Current extra insets that bound the mini-player's snap region.
+  ///
+  /// Read by [PlayerAnimationMixin] when calculating snap positions.
+  /// Call [updateConstraints] to change this at runtime.
+  ViewportInsets viewportInsets;
+
+  FloatingViewController({
+    this.collapsedScale = 0.45,
+    this.expandedAspectRatio = 16 / 9,
+    this.collapsedAspectRatio = 16 / 10,
+    this.collapsedRadius = 24.0,
+    this.collapsedMargin = const EdgeInsets.symmetric(
+      horizontal: 12.0,
+      vertical: 8.0,
+    ),
+    this.snapDistanceFactor = 0.35,
+    this.snapVelocityThreshold = 1.5,
+    ViewportInsets initialInsets = const ViewportInsets.zero(),
+  }) : viewportInsets = initialInsets;
+
+  // ── Runtime constraint update ─────────────────────────────────────────────
+
+  /// Updates the viewport insets that bound the mini-player's snap region.
+  ///
+  /// Call this whenever persistent UI chrome is shown or hidden — e.g. when a
+  /// bottom nav bar appears or the app switches to a fullscreen route.
+  ///
+  /// The mini-player position is immediately re-snapped if the player is
+  /// currently in the collapsed state.
+  ///
+  /// ```dart
+  /// // Bottom nav bar became visible:
+  /// controller.updateConstraints(
+  ///   const ViewportInsets(bottom: kBottomNavigationBarHeight),
+  /// );
+  ///
+  /// // No persistent chrome:
+  /// controller.updateConstraints(const ViewportInsets.zero());
+  /// ```
+  void updateConstraints(ViewportInsets insets) {
+    if (viewportInsets == insets) return;
+    viewportInsets = insets;
+    floatingViewKey?.currentState?.reapplyConstraints();
+  }
 
   /// Opens a new floating player overlay.
   ///

@@ -120,6 +120,16 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     if (_controllerInitialized) return;
     c = context.floatingController;
     _controllerInitialized = true;
+
+    // Apply layout config from the controller.
+    collapsedScale = c.collapsedScale;
+    expandedAspectRatio = c.expandedAspectRatio;
+    collapsedAspectRatio = c.collapsedAspectRatio;
+    collapsedRadius = c.collapsedRadius;
+    collapsedMargin = c.collapsedMargin;
+    snapDistanceFactor = c.snapDistanceFactor;
+    snapVelocityThreshold = c.snapVelocityThreshold;
+
     _initRouteManagement(context);
   }
 
@@ -289,9 +299,17 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
 
   double get _systemNavBarHeight => MediaQuery.of(context).padding.bottom;
 
-  double get _appBottomNavBarHeight => widget.bottomNavBarHeight;
+  /// Extra bottom inset from app chrome (e.g. bottom nav bar).
+  double get _extraBottomInset => c.viewportInsets.bottom;
 
-  double get _bottomInsetTotal => _systemNavBarHeight + _appBottomNavBarHeight;
+  /// Extra top inset from app chrome (e.g. a persistent banner below the appbar).
+  double get _extraTopInset => c.viewportInsets.top;
+
+  /// Extra left/right insets from app chrome (e.g. side rails).
+  double get _extraLeftInset => c.viewportInsets.left;
+  double get _extraRightInset => c.viewportInsets.right;
+
+  double get _totalBottomInset => _systemNavBarHeight + _extraBottomInset;
 
   void setCollapseOffsets(Size screenSize) {
     _screenSize = screenSize;
@@ -299,13 +317,33 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     final collapsedWidth = screenSize.width * collapsedScale;
     final collapsedHeight = collapsedWidth / collapsedAspectRatio;
 
-    _collapseX = screenSize.width - collapsedWidth - collapsedMargin.right;
+    _collapseX =
+        screenSize.width -
+        collapsedWidth -
+        collapsedMargin.right -
+        _extraRightInset;
     _collapseY =
         screenSize.height -
         collapsedHeight -
         collapsedMargin.bottom -
         kToolbarHeight -
-        _bottomInsetTotal;
+        _totalBottomInset;
+  }
+
+  /// Called by [FloatingViewController.updateConstraints] to re-snap the
+  /// mini-player when viewport insets change at runtime.
+  void reapplyConstraints() {
+    if (_screenSize == null) return;
+    setCollapseOffsets(_screenSize!);
+    if (c.floatingState.value == FloatingState.collapsed &&
+        _collapsedPosition != null) {
+      _collapsedPosition = _clampCollapsedPosition(
+        _collapsedPosition!,
+        _screenSize!,
+      );
+      _lastCollapsedPosition = _collapsedPosition;
+      _snapToCorner(Offset.zero);
+    }
   }
 
   /// Clamps the animation offset to stay within visible bounds.
@@ -326,9 +364,12 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     final minX = margin.left;
     final minY = margin.top;
 
-    final maxX = safeMax(screenSize.width - childW - margin.right, minX);
+    final maxX = safeMax(
+      screenSize.width - childW - margin.right - _extraRightInset,
+      minX,
+    );
     final maxY = safeMax(
-      screenSize.height - childH - margin.bottom - _bottomInsetTotal,
+      screenSize.height - childH - margin.bottom - _totalBottomInset,
       minY,
     );
 
@@ -507,15 +548,19 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     final childWidth = screenSize.width * collapsedScale;
     final childHeight = childWidth / collapsedAspectRatio;
 
-    final minX = collapsedMargin.left;
-    final maxX = screenSize.width - childWidth - collapsedMargin.right;
-    final minY = collapsedMargin.top;
+    final minX = collapsedMargin.left + _extraLeftInset;
+    final maxX =
+        screenSize.width -
+        childWidth -
+        collapsedMargin.right -
+        _extraRightInset;
+    final minY = collapsedMargin.top + _extraTopInset;
     final maxY =
         screenSize.height -
         childHeight -
         collapsedMargin.bottom -
         kToolbarHeight -
-        _bottomInsetTotal;
+        _totalBottomInset;
 
     return Offset(pos.dx.clamp(minX, maxX), pos.dy.clamp(minY, maxY));
   }
@@ -524,15 +569,19 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
     final childWidth = screenSize.width * collapsedScale;
     final childHeight = childWidth / collapsedAspectRatio;
 
-    final left = collapsedMargin.left;
-    final right = screenSize.width - childWidth - collapsedMargin.right;
-    final top = collapsedMargin.top + kToolbarHeight;
+    final left = collapsedMargin.left + _extraLeftInset;
+    final right =
+        screenSize.width -
+        childWidth -
+        collapsedMargin.right -
+        _extraRightInset;
+    final top = collapsedMargin.top + kToolbarHeight + _extraTopInset;
     final bottom =
         screenSize.height -
         childHeight -
         collapsedMargin.bottom -
         kToolbarHeight -
-        _bottomInsetTotal;
+        _totalBottomInset;
 
     final corners = [
       Offset(left, top),

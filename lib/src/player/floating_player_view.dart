@@ -4,7 +4,6 @@ import 'package:video_player/video_player.dart';
 import '../controller/floating_view_controller.dart';
 import '../gestures/player_animation_mixin.dart';
 import '../models/floating_state.dart';
-import '../models/video_quality.dart';
 import 'player_view.dart';
 import 'widgets/circle_button.dart';
 
@@ -30,9 +29,6 @@ typedef SlideAnimationCallback = void Function(AnimationController controller);
 class FloatingPlayerView extends StatefulWidget {
   /// URL of the video to play. If `null` a loading indicator is shown.
   final String? videoUrl;
-
-  /// Optional quality selection.  If omitted the [videoUrl] is used directly.
-  final VideoQuality? quality;
 
   /// Which kind of content is currently playing (affects position restoration).
   final PlayingContentType playingContentType;
@@ -66,15 +62,8 @@ class FloatingPlayerView extends StatefulWidget {
   /// Defaults to a simple black scaffold with a progress indicator.
   final Widget? loadingWidget;
 
-  /// Height reserved for the host app's bottom navigation bar.
-  ///
-  /// Used when calculating mini-player snap positions.
-  /// Defaults to [kBottomNavigationBarHeight] (56 dp).
-  final double bottomNavBarHeight;
-
   const FloatingPlayerView({
     this.videoUrl,
-    this.quality,
     this.playingContentType = PlayingContentType.video,
     this.autoPlay = true,
     this.playbackSpeed = 1.0,
@@ -83,7 +72,6 @@ class FloatingPlayerView extends StatefulWidget {
     this.onSettingsPressed,
     this.contentBuilder,
     this.loadingWidget,
-    this.bottomNavBarHeight = kBottomNavigationBarHeight,
     super.key,
   });
 
@@ -198,7 +186,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
               child: PlayerView(
                 key: playerKey,
                 videoUrl: widget.videoUrl,
-                quality: widget.quality,
                 playingContentType: widget.playingContentType,
                 autoPlay: _shouldAutoPlayPlayer,
                 playbackSpeed: _currentPlaybackSpeed,
@@ -286,7 +273,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                 child: PlayerView(
                   key: playerKey,
                   videoUrl: widget.videoUrl,
-                  quality: widget.quality,
                   playingContentType: widget.playingContentType,
                   autoPlay: _shouldAutoPlayPlayer,
                   playbackSpeed: _currentPlaybackSpeed,
