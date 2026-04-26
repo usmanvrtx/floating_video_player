@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:video_player/video_player.dart';
 
 import '../models/floating_state.dart';
 import '../player/floating_player_view.dart';
+
+/// Builder for custom player controls.
+///
+/// If you want to use custom controls instead of the default [PlayerControls],
+/// provide a builder that creates your control widget with the given parameters.
+typedef PlayerControlsBuilder =
+    Widget Function(
+      VideoPlayerController controller,
+      ValueNotifier<FloatingState> overlayState,
+      VoidCallback? onPlayPressed,
+    );
 
 // ---------------------------------------------------------------------------
 // ViewportInsets
@@ -106,6 +118,17 @@ class FloatingViewController {
   /// Call [updateConstraints] to change this at runtime.
   ViewportInsets viewportInsets;
 
+  // ── Custom controls ───────────────────────────────────────────────────────
+
+  /// Whether to use custom controls instead of the default [PlayerControls].
+  final bool useCustomControls;
+
+  /// Builder for custom player controls.
+  ///
+  /// Only used if [useCustomControls] is `true`.
+  /// Receives the video controller, floating state, and callback handlers.
+  final PlayerControlsBuilder? customControlsBuilder;
+
   FloatingViewController({
     this.collapsedScale = 0.45,
     this.expandedAspectRatio = 16 / 9,
@@ -118,6 +141,8 @@ class FloatingViewController {
     this.snapDistanceFactor = 0.35,
     this.snapVelocityThreshold = 1.5,
     ViewportInsets initialInsets = const ViewportInsets.zero(),
+    this.useCustomControls = false,
+    this.customControlsBuilder,
   }) : viewportInsets = initialInsets;
 
   // ── Runtime constraint update ─────────────────────────────────────────────

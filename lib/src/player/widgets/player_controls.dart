@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../controller/floating_view_controller.dart';
 import '../../models/floating_state.dart';
 import 'video_seek_bar.dart';
 
@@ -14,32 +15,25 @@ import 'video_seek_bar.dart';
 /// - Long-press to 2× fast-forward
 /// - Settings, CC, fullscreen, arrow-down callbacks
 /// - Landscape / collapsed / expanded states
-class CustomPlayerControls extends StatefulWidget {
+class PlayerControls extends StatefulWidget {
   final VideoPlayerController controller;
-  final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onSettingsPressed;
-  final VoidCallback? onFullscreenPressed;
   final VoidCallback? onPlayPressed;
   final ValueNotifier<FloatingState> overlayState;
 
-  const CustomPlayerControls({
+  const PlayerControls({
     required this.controller,
     required this.overlayState,
-    this.onArrowDownPressed,
-    this.onSettingsPressed,
-    this.onFullscreenPressed,
     this.onPlayPressed,
     super.key,
   });
 
   @override
-  State<CustomPlayerControls> createState() => CustomPlayerControlsState();
+  State<PlayerControls> createState() => PlayerControlsState();
 }
 
-class CustomPlayerControlsState extends State<CustomPlayerControls> {
+class PlayerControlsState extends State<PlayerControls> {
   bool _controlsVisible = true;
   Timer? _hideTimer;
-
   int _seekTapCountLeft = 0;
   int _seekTapCountRight = 0;
   int _leftSeekSeconds = 0;
@@ -135,12 +129,6 @@ class CustomPlayerControlsState extends State<CustomPlayerControls> {
         _rightSeekSeconds = 0;
       });
     });
-  }
-
-  static String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
   }
 
   @override
@@ -289,8 +277,6 @@ class CustomPlayerControlsState extends State<CustomPlayerControls> {
               if (_controlsVisible && !_isCollapsed)
                 _TopControls(
                   isLandscape: _isLandscape,
-                  onArrowDownPressed: widget.onArrowDownPressed,
-                  onSettingsPressed: widget.onSettingsPressed,
                 ),
 
               if (_controlsVisible && !_isCollapsed)
@@ -306,11 +292,6 @@ class CustomPlayerControlsState extends State<CustomPlayerControls> {
                 _BottomControls(
                   controller: widget.controller,
                   isLandscape: _isLandscape,
-                  onFullscreenPressed: () {
-                    hideControls();
-                    widget.onFullscreenPressed?.call();
-                  },
-                  formatDuration: _formatDuration,
                 ),
             ],
           ),
@@ -377,13 +358,9 @@ class _SeekIndicator extends StatelessWidget {
 
 class _TopControls extends StatelessWidget {
   final bool isLandscape;
-  final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onSettingsPressed;
 
   const _TopControls({
     required this.isLandscape,
-    this.onArrowDownPressed,
-    this.onSettingsPressed,
   });
 
   @override
@@ -396,7 +373,9 @@ class _TopControls extends StatelessWidget {
         children: [
           if (!isLandscape)
             InkWell(
-              onTap: onArrowDownPressed,
+              onTap: () {
+                context.floatingController.collapse();
+              },
               child: const SizedBox(
                 width: 28,
                 height: 28,
@@ -412,13 +391,6 @@ class _TopControls extends StatelessWidget {
             ),
 
           const Spacer(),
-
-          IconButton(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            constraints: const BoxConstraints(),
-            icon: const Icon(Icons.settings, color: Colors.white, size: 22),
-            onPressed: onSettingsPressed,
-          ),
         ],
       ),
     );
@@ -574,15 +546,11 @@ class _CenterControls extends StatelessWidget {
 
 class _BottomControls extends StatefulWidget {
   final VideoPlayerController controller;
-  final VoidCallback onFullscreenPressed;
-  final String Function(Duration) formatDuration;
   final bool isLandscape;
 
   const _BottomControls({
     required this.controller,
     required this.isLandscape,
-    required this.onFullscreenPressed,
-    required this.formatDuration,
   });
 
   @override
@@ -644,7 +612,13 @@ class _BottomControlsState extends State<_BottomControls> {
                     ),
 
                     InkWell(
-                      onTap: widget.onFullscreenPressed,
+                      onTap: () {
+                        if (widget.isLandscape) {
+                          context.floatingController.closeLandscapeVideo();
+                        } else {
+                          context.floatingController.openLandscapeVideo();
+                        }
+                      },
                       child: Container(
                         height: 35,
                         width: 35,

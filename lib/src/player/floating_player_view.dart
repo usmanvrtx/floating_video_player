@@ -12,9 +12,6 @@ typedef SlideAnimationCallback = void Function(AnimationController controller);
 class FloatingPlayerView extends StatefulWidget {
   final String? videoUrl;
   final bool autoPlay;
-  final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onFullscreenPressed;
-  final VoidCallback? onSettingsPressed;
   final Widget Function(
     BuildContext context,
     SlideAnimationCallback onSlideAnimation,
@@ -24,9 +21,6 @@ class FloatingPlayerView extends StatefulWidget {
   const FloatingPlayerView({
     this.videoUrl,
     this.autoPlay = true,
-    this.onArrowDownPressed,
-    this.onFullscreenPressed,
-    this.onSettingsPressed,
     this.contentBuilder,
     super.key,
   });
@@ -70,24 +64,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     }
   }
 
-  void _onFullscreenPressed() {
-    final state = context.floatingController.floatingState.value;
-    if (state == FloatingState.landscaped) {
-      context.floatingController.closeLandscapeVideo();
-    } else if (state == FloatingState.expanded) {
-      context.floatingController.openLandscapeVideo();
-    }
-  }
-
-  void _onArrowDownPressed() {
-    if (context.floatingController.floatingState.value ==
-        FloatingState.landscaped) {
-      context.floatingController.closeLandscapeVideo();
-    } else {
-      c.collapse();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -127,10 +103,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                 autoPlay: _shouldAutoPlayPlayer,
                 floatingState: context.floatingController.floatingState,
                 enableDragDownGesture: true,
-                onArrowDownPressed:
-                    widget.onArrowDownPressed ?? _onArrowDownPressed,
-                onFullscreenPressed: _onFullscreenPressed,
-                onSettingsPressed: widget.onSettingsPressed,
                 onDragDownThresholdReached: () {
                   context.floatingController.closeLandscapeVideo();
                 },
@@ -211,10 +183,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                   videoUrl: widget.videoUrl,
                   autoPlay: _shouldAutoPlayPlayer,
                   floatingState: context.floatingController.floatingState,
-                  onArrowDownPressed:
-                      widget.onArrowDownPressed ?? _onArrowDownPressed,
-                  onFullscreenPressed: _onFullscreenPressed,
-                  onSettingsPressed: widget.onSettingsPressed,
                 ),
               );
             },

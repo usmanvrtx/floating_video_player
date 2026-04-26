@@ -4,8 +4,9 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../controller/floating_view_controller.dart';
 import '../models/floating_state.dart';
-import 'widgets/custom_player_controls.dart';
+import 'widgets/player_controls.dart';
 
 class PlayerView extends StatefulWidget {
   final String? videoUrl;
@@ -13,9 +14,6 @@ class PlayerView extends StatefulWidget {
   final ValueNotifier<FloatingState> floatingState;
   final VoidCallback? onDragDownThresholdReached;
   final bool enableDragDownGesture;
-  final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onFullscreenPressed;
-  final VoidCallback? onSettingsPressed;
 
   const PlayerView({
     required this.floatingState,
@@ -23,9 +21,6 @@ class PlayerView extends StatefulWidget {
     this.autoPlay = true,
     this.onDragDownThresholdReached,
     this.enableDragDownGesture = false,
-    this.onArrowDownPressed,
-    this.onFullscreenPressed,
-    this.onSettingsPressed,
     super.key,
   });
 
@@ -98,25 +93,35 @@ class PlayerViewState extends State<PlayerView> {
 
       await _videoPlayerController!.initialize();
 
+      void onPlayPressedCallback() {
+        if (_videoPlayerController!.value.isPlaying) {
+          _videoPlayerController!.pause();
+        } else {
+          _videoPlayerController!.play();
+        }
+      }
+
+      final floatingController = context.floatingController;
+      final customControls =
+          floatingController.useCustomControls &&
+              floatingController.customControlsBuilder != null
+          ? floatingController.customControlsBuilder!(
+              _videoPlayerController!,
+              widget.floatingState,
+              onPlayPressedCallback,
+            )
+          : PlayerControls(
+              controller: _videoPlayerController!,
+              overlayState: widget.floatingState,
+              onPlayPressed: onPlayPressedCallback,
+            );
+
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController!,
         autoPlay: widget.autoPlay || _wasPlaying,
         looping: false,
         allowedScreenSleep: false,
-        customControls: CustomPlayerControls(
-          controller: _videoPlayerController!,
-          overlayState: widget.floatingState,
-          onPlayPressed: () {
-            if (_videoPlayerController!.value.isPlaying) {
-              _videoPlayerController!.pause();
-            } else {
-              _videoPlayerController!.play();
-            }
-          },
-          onArrowDownPressed: widget.onArrowDownPressed ?? () {},
-          onFullscreenPressed: widget.onFullscreenPressed ?? () {},
-          onSettingsPressed: widget.onSettingsPressed ?? () {},
-        ),
+        customControls: customControls,
       );
 
       if (!_shouldRestoreState && widget.autoPlay) {
