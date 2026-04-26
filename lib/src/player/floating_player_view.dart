@@ -189,7 +189,10 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
               )
             : null,
         builder: (context, floatingState, bottomContent) {
-          if (floatingState == FloatingState.landscaped) {
+          final screenIsLandscape =
+              MediaQuery.of(context).orientation == Orientation.landscape;
+
+          if (floatingState == FloatingState.landscaped || screenIsLandscape) {
             return Material(
               color: Colors.black,
               child: PlayerView(
