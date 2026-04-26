@@ -25,13 +25,13 @@ A Flutter package that provides a **YouTube-style floating video player** — ex
 ## Demo
 
 ### Expanded → Collapsed Transition
-![Expand-collapse demo](doc/gifs/expand-collapse.gif)
+![Expand-collapse demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/expand-collapse.gif)
 
 ### Mini-Player Drag & Snap
-![Mini-player drag demo](doc/gifs/drag-snap.gif)
+![Mini-player drag demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/drag-snap.gif)
 
 ### Landscape Mode
-![Landscape mode demo](doc/gifs/landscape.gif)
+![Landscape mode demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/landscape.gif)
 
 ---
 

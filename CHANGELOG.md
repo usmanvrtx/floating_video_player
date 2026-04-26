@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Fix demo GIFs to display properly on pub.dev by using GitHub raw URLs.
+
 ## 0.1.1
 
 * Fix homepage URL to point to correct GitHub repository.

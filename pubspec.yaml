@@ -4,7 +4,7 @@ description: >-
   picture-in-picture mini-player with snap-to-corner physics, portrait/landscape
   orientation handling, spring-physics drag gestures, and a customisable controls
   layer built on top of video_player and chewie.
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/usmanvrtx/floating_video_player
 
 environment:
