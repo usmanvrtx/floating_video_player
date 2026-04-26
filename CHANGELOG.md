@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Fix homepage URL to point to correct GitHub repository.
+
 ## 0.1.0
 
 * Initial release.
