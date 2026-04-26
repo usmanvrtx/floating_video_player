@@ -5,7 +5,7 @@ description: >-
   orientation handling, spring-physics drag gestures, and a customisable controls
   layer built on top of video_player and chewie.
 version: 0.1.0
-homepage: https://github.com/your-username/floating_video_player
+homepage: https://github.com/usmanvrtx/floating_video_player
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
