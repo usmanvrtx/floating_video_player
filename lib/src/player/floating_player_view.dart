@@ -4,13 +4,14 @@ import 'package:video_player/video_player.dart';
 import '../controller/floating_view_controller.dart';
 import '../gestures/player_animation_mixin.dart';
 import '../models/floating_state.dart';
+import '../models/video_source.dart';
 import 'player_view.dart';
 import 'widgets/circle_button.dart';
 
 typedef SlideAnimationCallback = void Function(AnimationController controller);
 
 class FloatingPlayerView extends StatefulWidget {
-  final String? videoUrl;
+  final VideoSource? source;
   final bool autoPlay;
   final Widget Function(
     BuildContext context,
@@ -19,7 +20,7 @@ class FloatingPlayerView extends StatefulWidget {
   contentBuilder;
 
   const FloatingPlayerView({
-    this.videoUrl,
+    this.source,
     this.autoPlay = true,
     this.contentBuilder,
     super.key,
@@ -121,7 +122,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
               color: Colors.black,
               child: PlayerView(
                 key: playerKey,
-                videoUrl: widget.videoUrl,
+                source: widget.source,
                 autoPlay: _shouldAutoPlayPlayer,
                 floatingState: context.floatingController.floatingState,
                 enableDragDownGesture: true,
@@ -202,7 +203,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                 height: finalHeight,
                 child: PlayerView(
                   key: playerKey,
-                  videoUrl: widget.videoUrl,
+                  source: widget.source,
                   autoPlay: _shouldAutoPlayPlayer,
                   floatingState: context.floatingController.floatingState,
                 ),

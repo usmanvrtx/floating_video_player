@@ -150,7 +150,7 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
         opaque: false,
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
-        pageBuilder: (_, _, _) => WillPopScope(
+        pageBuilder: (_, __, ___) => WillPopScope(
           // ignore: deprecated_member_use
           onWillPop: () => handleFloatingWillPop(context),
           child: AnimatedBuilder(
@@ -164,7 +164,7 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
             },
           ),
         ),
-        transitionsBuilder: (_, _, _, child) => child,
+        transitionsBuilder: (_, __, ___, child) => child,
       );
 
       _routeAttached = true;

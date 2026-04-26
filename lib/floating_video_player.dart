@@ -1,5 +1,6 @@
 // Models
 export 'src/models/floating_state.dart';
+export 'src/models/video_source.dart';
 
 // Controller & provider
 export 'src/controller/floating_view_controller.dart'

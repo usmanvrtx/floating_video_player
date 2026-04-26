@@ -315,9 +315,7 @@ class FloatingViewProvider extends InheritedWidget {
 // Internal helpers
 // ---------------------------------------------------------------------------
 
-/// A lightweight fade-in wrapper that replaces the animate_do FadeIn widget
-/// inside the overlay entry so that animate_do is only required by the
-/// playback-speed sheet.
+/// A lightweight fade-in wrapper used inside the overlay entry.
 class _FadeInWrapper extends StatefulWidget {
   final Widget child;
   final Duration duration;

@@ -1,15 +1,14 @@
-import 'dart:io';
-
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controller/floating_view_controller.dart';
 import '../models/floating_state.dart';
+import '../models/video_source.dart';
 import 'widgets/player_controls.dart';
 
 class PlayerView extends StatefulWidget {
-  final String? videoUrl;
+  final VideoSource? source;
   final bool autoPlay;
   final ValueNotifier<FloatingState> floatingState;
   final VoidCallback? onDragDownThresholdReached;
@@ -17,7 +16,7 @@ class PlayerView extends StatefulWidget {
 
   const PlayerView({
     required this.floatingState,
-    this.videoUrl,
+    this.source,
     this.autoPlay = true,
     this.onDragDownThresholdReached,
     this.enableDragDownGesture = false,
@@ -59,7 +58,7 @@ class PlayerViewState extends State<PlayerView> {
   void didUpdateWidget(covariant PlayerView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.videoUrl != oldWidget.videoUrl) {
+    if (widget.source != oldWidget.source) {
       if (_videoPlayerController != null &&
           _videoPlayerController!.value.isInitialized) {
         _persistentPosition = _videoPlayerController!.value.position;
@@ -76,20 +75,12 @@ class PlayerViewState extends State<PlayerView> {
   }
 
   Future<void> _initializePlayer() async {
-    if (widget.videoUrl == null) return;
+    if (widget.source == null) return;
 
     setState(() => _isInitializing = true);
 
     try {
-      if (widget.videoUrl!.startsWith('http')) {
-        _videoPlayerController = VideoPlayerController.networkUrl(
-          Uri.parse(widget.videoUrl!),
-        );
-      } else {
-        _videoPlayerController = VideoPlayerController.file(
-          File(widget.videoUrl!),
-        );
-      }
+      _videoPlayerController = widget.source!.toController();
 
       await _videoPlayerController!.initialize();
 
