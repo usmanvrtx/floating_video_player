@@ -17,7 +17,6 @@ import 'video_seek_bar.dart';
 class CustomPlayerControls extends StatefulWidget {
   final VideoPlayerController controller;
   final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onCCPressed;
   final VoidCallback? onSettingsPressed;
   final VoidCallback? onFullscreenPressed;
   final VoidCallback? onPlayPressed;
@@ -27,7 +26,6 @@ class CustomPlayerControls extends StatefulWidget {
     required this.controller,
     required this.overlayState,
     this.onArrowDownPressed,
-    this.onCCPressed,
     this.onSettingsPressed,
     this.onFullscreenPressed,
     this.onPlayPressed,
@@ -292,7 +290,6 @@ class CustomPlayerControlsState extends State<CustomPlayerControls> {
                 _TopControls(
                   isLandscape: _isLandscape,
                   onArrowDownPressed: widget.onArrowDownPressed,
-                  onCCPressed: widget.onCCPressed,
                   onSettingsPressed: widget.onSettingsPressed,
                 ),
 
@@ -381,13 +378,11 @@ class _SeekIndicator extends StatelessWidget {
 class _TopControls extends StatelessWidget {
   final bool isLandscape;
   final VoidCallback? onArrowDownPressed;
-  final VoidCallback? onCCPressed;
   final VoidCallback? onSettingsPressed;
 
   const _TopControls({
     required this.isLandscape,
     this.onArrowDownPressed,
-    this.onCCPressed,
     this.onSettingsPressed,
   });
 
@@ -417,15 +412,6 @@ class _TopControls extends StatelessWidget {
             ),
 
           const Spacer(),
-
-          IconButton(
-            icon: const Icon(
-              Icons.closed_caption_outlined,
-              color: Colors.white,
-              size: 26,
-            ),
-            onPressed: onCCPressed,
-          ),
 
           IconButton(
             padding: const EdgeInsets.symmetric(horizontal: 6),

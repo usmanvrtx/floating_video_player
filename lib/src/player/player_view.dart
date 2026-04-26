@@ -7,15 +7,9 @@ import 'package:video_player/video_player.dart';
 import '../models/floating_state.dart';
 import 'widgets/custom_player_controls.dart';
 
-/// The core video-player widget.
-///
-/// Handles initialisation, URL changes, playback-speed changes, and the
-/// optional drag-down gesture (used in landscape mode to exit full-screen).
 class PlayerView extends StatefulWidget {
   final String? videoUrl;
-  final PlayingContentType playingContentType;
   final bool autoPlay;
-  final double playbackSpeed;
   final ValueNotifier<FloatingState> floatingState;
   final VoidCallback? onDragDownThresholdReached;
   final bool enableDragDownGesture;
@@ -25,10 +19,8 @@ class PlayerView extends StatefulWidget {
 
   const PlayerView({
     required this.floatingState,
-    this.playingContentType = PlayingContentType.video,
     this.videoUrl,
     this.autoPlay = true,
-    this.playbackSpeed = 1.0,
     this.onDragDownThresholdReached,
     this.enableDragDownGesture = false,
     this.onArrowDownPressed,
@@ -72,9 +64,6 @@ class PlayerViewState extends State<PlayerView> {
   void didUpdateWidget(covariant PlayerView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final contentTypeChanged =
-        widget.playingContentType != oldWidget.playingContentType;
-
     if (widget.videoUrl != oldWidget.videoUrl) {
       if (_videoPlayerController != null &&
           _videoPlayerController!.value.isInitialized) {
@@ -82,24 +71,12 @@ class PlayerViewState extends State<PlayerView> {
         _persistentWasPlaying = _videoPlayerController!.value.isPlaying;
       }
 
-      if (contentTypeChanged) {
-        _persistentPosition = Duration.zero;
-        _persistentWasPlaying = false;
-      }
+      _wasPlaying = _persistentWasPlaying;
+      _currentPosition = _persistentPosition;
+      _shouldRestoreState = true;
 
-      if (!contentTypeChanged) {
-        _wasPlaying = _persistentWasPlaying;
-        _currentPosition = _persistentPosition;
-        _shouldRestoreState = true;
-      } else {
-        _wasPlaying = false;
-        _currentPosition = Duration.zero;
-        _shouldRestoreState = false;
-      }
       _disposeControllers();
       _initializePlayer();
-    } else if (widget.playbackSpeed != oldWidget.playbackSpeed) {
-      _videoPlayerController?.setPlaybackSpeed(widget.playbackSpeed);
     }
   }
 
@@ -141,8 +118,6 @@ class PlayerViewState extends State<PlayerView> {
           onSettingsPressed: widget.onSettingsPressed ?? () {},
         ),
       );
-
-      await _videoPlayerController!.setPlaybackSpeed(widget.playbackSpeed);
 
       if (!_shouldRestoreState && widget.autoPlay) {
         await _videoPlayerController!.play();

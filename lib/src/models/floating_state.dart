@@ -1,7 +1,3 @@
-/// Identifies which kind of content is currently loaded in the player.
-/// Used to decide whether playback position should be preserved on URL change.
-enum PlayingContentType { video, animation, short }
-
 /// Describes the current display state of the floating player.
 enum FloatingState {
   /// Player is not rendered at all.

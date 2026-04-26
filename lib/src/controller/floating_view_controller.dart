@@ -243,24 +243,7 @@ class FloatingViewController {
     floatingViewKey?.currentState?.enterCollapsedView();
   }
 
-  // ── Convenience aliases matching the requested public API ─────────────────
-
-  /// Alias for [expand].
-  void restore() => expand();
-
-  /// Alias for [collapse].
-  void minimize() => collapse();
-
-  /// Alias for [open] when used in an embedded/floating context.
-  void openFloating(
-    BuildContext context,
-    Widget Function(GlobalKey<FloatingPlayerViewState> key) viewBuilder,
-  ) => open(context, viewBuilder);
-
-  /// Alias for [close].
-  void closeFloating() => close();
-
-  /// Plays the current video. Delegates to the player state.
+  /// Plays the current video.
   void play() {
     floatingViewKey?.currentState?.playerKey.currentState?.videoPlayerController
         ?.play();

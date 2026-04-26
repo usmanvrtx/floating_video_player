@@ -7,71 +7,27 @@ import '../models/floating_state.dart';
 import 'player_view.dart';
 import 'widgets/circle_button.dart';
 
-/// Callback that supplies an [AnimationController] the content widget can
-/// drive for an entrance slide-in animation when first shown.
 typedef SlideAnimationCallback = void Function(AnimationController controller);
 
-/// The main floating player view.
-///
-/// Place this inside a [FloatingViewProvider] and open it through
-/// [FloatingViewController.open]:
-///
-/// ```dart
-/// context.floatingController.open(context, (key) => FloatingPlayerView(
-///   key: key,
-///   videoUrl: 'https://...',
-///   contentBuilder: (ctx, onSlide) => MyArticleContent(onSlide: onSlide),
-/// ));
-/// ```
-///
-/// To embed the player directly in the widget tree (non-overlay mode), simply
-/// place [FloatingPlayerView] as a child of any widget.
 class FloatingPlayerView extends StatefulWidget {
-  /// URL of the video to play. If `null` a loading indicator is shown.
   final String? videoUrl;
-
-  /// Which kind of content is currently playing (affects position restoration).
-  final PlayingContentType playingContentType;
-
-  /// Whether to start playback automatically when the player is ready.
   final bool autoPlay;
-
-  /// Initial playback speed multiplier.
-  final double playbackSpeed;
-
-  /// Called when the user presses the ↓ arrow button.
   final VoidCallback? onArrowDownPressed;
-
-  /// Called when the user presses the fullscreen toggle button.
   final VoidCallback? onFullscreenPressed;
-
-  /// Called when the user presses the settings button.
   final VoidCallback? onSettingsPressed;
-
-  /// Builder for the scrollable content shown below the video in portrait mode.
-  ///
-  /// Receives a [SlideAnimationCallback] that the content widget can call with
-  /// its own [AnimationController] to trigger the entrance slide animation.
   final Widget Function(
     BuildContext context,
     SlideAnimationCallback onSlideAnimation,
   )?
   contentBuilder;
 
-  /// Widget shown while the player is in a loading/error state.
-  /// Defaults to a simple black scaffold with a progress indicator.
-  final Widget? loadingWidget;
-
   const FloatingPlayerView({
     this.videoUrl,
-    this.playingContentType = PlayingContentType.video,
     this.autoPlay = true,
-    this.playbackSpeed = 1.0,
     this.onArrowDownPressed,
     this.onFullscreenPressed,
     this.onSettingsPressed,
     this.contentBuilder,
-    this.loadingWidget,
     super.key,
   });
 
@@ -83,13 +39,9 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     with TickerProviderStateMixin, PlayerAnimationMixin {
   bool _showSlideAnimation = false;
 
-  double get _currentPlaybackSpeed => widget.playbackSpeed;
-
   bool get _shouldAutoPlayPlayer {
     final controller = playerKey.currentState?.videoPlayerController;
-    if (controller == null || !controller.value.isInitialized) {
-      return true;
-    }
+    if (controller == null || !controller.value.isInitialized) return true;
     return controller.value.isPlaying;
   }
 
@@ -108,8 +60,6 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
 
   final GlobalKey<PlayerViewState> playerKey = GlobalKey<PlayerViewState>();
 
-  // ── Slide animation for bottom content ───────────────────────────────────
-
   void _slideAnimation(AnimationController controller) {
     if (_showSlideAnimation) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -120,33 +70,21 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     }
   }
 
-  // ── Callbacks ─────────────────────────────────────────────────────────────
-
-  void _onSettingsPressed() {
-    widget.onSettingsPressed?.call();
-  }
-
   void _onFullscreenPressed() {
-    if (context.floatingController.floatingState.value ==
-        FloatingState.landscaped) {
+    final state = context.floatingController.floatingState.value;
+    if (state == FloatingState.landscaped) {
       context.floatingController.closeLandscapeVideo();
-      return;
-    }
-    if (context.floatingController.floatingState.value ==
-        FloatingState.expanded) {
+    } else if (state == FloatingState.expanded) {
       context.floatingController.openLandscapeVideo();
-      return;
     }
   }
 
   void _onArrowDownPressed() {
-    if (context.floatingController.floatingState.value !=
+    if (context.floatingController.floatingState.value ==
         FloatingState.landscaped) {
-      c.collapse();
-      return;
-    } else {
       context.floatingController.closeLandscapeVideo();
-      return;
+    } else {
+      c.collapse();
     }
   }
 
@@ -186,15 +124,13 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
               child: PlayerView(
                 key: playerKey,
                 videoUrl: widget.videoUrl,
-                playingContentType: widget.playingContentType,
                 autoPlay: _shouldAutoPlayPlayer,
-                playbackSpeed: _currentPlaybackSpeed,
                 floatingState: context.floatingController.floatingState,
                 enableDragDownGesture: true,
                 onArrowDownPressed:
                     widget.onArrowDownPressed ?? _onArrowDownPressed,
                 onFullscreenPressed: _onFullscreenPressed,
-                onSettingsPressed: _onSettingsPressed,
+                onSettingsPressed: widget.onSettingsPressed,
                 onDragDownThresholdReached: () {
                   context.floatingController.closeLandscapeVideo();
                 },
@@ -273,14 +209,12 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                 child: PlayerView(
                   key: playerKey,
                   videoUrl: widget.videoUrl,
-                  playingContentType: widget.playingContentType,
                   autoPlay: _shouldAutoPlayPlayer,
-                  playbackSpeed: _currentPlaybackSpeed,
                   floatingState: context.floatingController.floatingState,
                   onArrowDownPressed:
                       widget.onArrowDownPressed ?? _onArrowDownPressed,
                   onFullscreenPressed: _onFullscreenPressed,
-                  onSettingsPressed: _onSettingsPressed,
+                  onSettingsPressed: widget.onSettingsPressed,
                 ),
               );
             },
