@@ -32,6 +32,7 @@ class FloatingPlayerView extends StatefulWidget {
 class FloatingPlayerViewState extends State<FloatingPlayerView>
     with TickerProviderStateMixin, PlayerAnimationMixin {
   bool _showSlideAnimation = false;
+  bool _collapseAnimationComplete = false;
 
   bool get _shouldAutoPlayPlayer {
     final controller = playerKey.currentState?.videoPlayerController;
@@ -50,6 +51,27 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     super.didChangeDependencies();
     initFloatingController(context);
     setCollapseOffsets(MediaQuery.of(context).size);
+    
+    // Listen to animation controller to know when collapse completes
+    animationController.addStatusListener(_onAnimationStatusChanged);
+  }
+
+  void _onAnimationStatusChanged(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      // Animation completed - show controls only if still in collapsed state
+      if (mounted && isCollapsed) {
+        setState(() => _collapseAnimationComplete = true);
+      } else if (mounted && _collapseAnimationComplete) {
+        // If not collapsed anymore, hide the controls
+        setState(() => _collapseAnimationComplete = false);
+      }
+    } else if (status == AnimationStatus.forward ||
+        status == AnimationStatus.reverse) {
+      // Animation started - always hide controls during animation
+      if (mounted && _collapseAnimationComplete) {
+        setState(() => _collapseAnimationComplete = false);
+      }
+    }
   }
 
   final GlobalKey<PlayerViewState> playerKey = GlobalKey<PlayerViewState>();
@@ -188,7 +210,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
             },
           ),
         ),
-        if (isCollapsed) ..._collapsedControls(),
+        if (isCollapsed && _collapseAnimationComplete) ..._collapsedControls(),
       ],
     );
   }
@@ -231,6 +253,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
 
   @override
   void dispose() {
+    animationController.removeStatusListener(_onAnimationStatusChanged);
     disposeAnimationResources();
     super.dispose();
   }
