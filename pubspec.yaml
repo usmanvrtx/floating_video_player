@@ -1,11 +1,11 @@
-name: floating_video_player
-description: >-
+name: floatube_player
+description: >
   A Flutter package for a YouTube-style floating video player. Supports
   picture-in-picture mini-player with snap-to-corner physics, portrait/landscape
   orientation handling, spring-physics drag gestures, and a customisable controls
   layer built on top of video_player.
 version: 0.2.0
-homepage: https://github.com/usmanvrtx/floating_video_player
+homepage: https://github.com/usmanvrtx/floatube_player
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

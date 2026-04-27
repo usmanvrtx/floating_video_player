@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:floating_video_player/floating_video_player.dart';
+import 'package:floatube_player/floatube_player.dart';
 
 void main() {
   testWidgets('FloatingViewProvider smoke test', (WidgetTester tester) async {

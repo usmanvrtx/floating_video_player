@@ -1,6 +1,6 @@
-# floating_video_player
+# floatube_player
 
-[![pub.dev](https://img.shields.io/pub/v/floating_video_player.svg)](https://pub.dev/packages/floating_video_player)
+[![pub.dev](https://img.shields.io/pub/v/floatube_player.svg)](https://pub.dev/packages/floatube_player)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A Flutter package that provides a **YouTube-style floating video player** — expand to full portrait view, collapse to a draggable mini-player in any corner, or go full-screen landscape. Built on top of [`video_player`](https://pub.dev/packages/video_player).
@@ -25,13 +25,13 @@ A Flutter package that provides a **YouTube-style floating video player** — ex
 ## Demo
 
 ### Expanded → Collapsed Transition
-![Expand-collapse demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/expand-collapse.gif)
+![Expand-collapse demo](https://raw.githubusercontent.com/usmanvrtx/floatube_player/main/doc/gifs/expand-collapse.gif)
 
 ### Mini-Player Drag & Snap
-![Mini-player drag demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/drag-snap.gif)
+![Mini-player drag demo](https://raw.githubusercontent.com/usmanvrtx/floatube_player/main/doc/gifs/drag-snap.gif)
 
 ### Landscape Mode
-![Landscape mode demo](https://raw.githubusercontent.com/usmanvrtx/floating_video_player/main/doc/gifs/landscape.gif)
+![Landscape mode demo](https://raw.githubusercontent.com/usmanvrtx/floatube_player/main/doc/gifs/landscape.gif)
 
 ---
 
@@ -41,7 +41,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  floating_video_player: ^0.1.0
+  floatube_player: ^0.2.0
 ```
 
 ### Android
