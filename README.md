@@ -3,7 +3,7 @@
 [![pub.dev](https://img.shields.io/pub/v/floating_video_player.svg)](https://pub.dev/packages/floating_video_player)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A Flutter package that provides a **YouTube-style floating video player** — expand to full portrait view, collapse to a draggable mini-player in any corner, or go full-screen landscape. Built on top of [`video_player`](https://pub.dev/packages/video_player) and [`chewie`](https://pub.dev/packages/chewie).
+A Flutter package that provides a **YouTube-style floating video player** — expand to full portrait view, collapse to a draggable mini-player in any corner, or go full-screen landscape. Built on top of [`video_player`](https://pub.dev/packages/video_player).
 
 ---
 

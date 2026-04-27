@@ -11,9 +11,8 @@ import '../player/floating_player_view.dart';
 /// provide a builder that creates your control widget with the given parameters.
 typedef PlayerControlsBuilder =
     Widget Function(
-      VideoPlayerController controller,
-      ValueNotifier<FloatingState> overlayState,
-      VoidCallback? onPlayPressed,
+  VideoPlayerController videoController,
+  ValueNotifier<FloatingState> floatingState,
     );
 
 // ---------------------------------------------------------------------------

@@ -8,16 +8,10 @@ import '../models/video_source.dart';
 import 'player_view.dart';
 import 'widgets/circle_button.dart';
 
-typedef SlideAnimationCallback = void Function(AnimationController controller);
-
 class FloatingPlayerView extends StatefulWidget {
   final VideoSource? source;
   final bool autoPlay;
-  final Widget Function(
-    BuildContext context,
-    SlideAnimationCallback onSlideAnimation,
-  )?
-  contentBuilder;
+  final Widget Function()? contentBuilder;
 
   const FloatingPlayerView({
     this.source,
@@ -52,7 +46,10 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     super.didChangeDependencies();
     initFloatingController(context);
     setCollapseOffsets(MediaQuery.of(context).size);
-    
+
+    // Trigger slide animation
+    _slideAnimation();
+
     // Listen to animation controller to know when collapse completes
     animationController.addStatusListener(_onAnimationStatusChanged);
   }
@@ -77,13 +74,13 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
 
   final GlobalKey<PlayerViewState> playerKey = GlobalKey<PlayerViewState>();
 
-  void _slideAnimation(AnimationController controller) {
+  void _slideAnimation() {
     if (_showSlideAnimation) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.forward().then((_) => _showSlideAnimation = false);
+        animationController.forward().then((_) => _showSlideAnimation = false);
       });
     } else {
-      controller.value = 1;
+      animationController.value = 1;
     }
   }
 
@@ -108,7 +105,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                     );
                   },
                   child: RepaintBoundary(
-                    child: widget.contentBuilder!(context, _slideAnimation),
+                    child: widget.contentBuilder!(),
                   ),
                 ),
               )

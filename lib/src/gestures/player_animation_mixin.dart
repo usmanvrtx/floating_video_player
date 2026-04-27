@@ -150,6 +150,7 @@ mixin PlayerAnimationMixin on State<FloatingPlayerView>
         opaque: false,
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
+        // ignore: deprecated_member_use
         pageBuilder: (_, __, ___) => WillPopScope(
           // ignore: deprecated_member_use
           onWillPop: () => handleFloatingWillPop(context),

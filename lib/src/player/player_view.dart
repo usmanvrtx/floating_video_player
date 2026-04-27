@@ -1,4 +1,3 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -32,7 +31,7 @@ class PlayerViewState extends State<PlayerView> {
   static const Color _kPrimary = Color(0xFF4285F4);
 
   VideoPlayerController? _videoPlayerController;
-  ChewieController? _chewieController;
+  Widget? _controls;
   double? _dragDownStartY;
   double _dragDownTranslateY = 0.0;
   bool _didReachDragDownThreshold = false;
@@ -99,7 +98,6 @@ class PlayerViewState extends State<PlayerView> {
           ? floatingController.customControlsBuilder!(
               _videoPlayerController!,
               widget.floatingState,
-              onPlayPressedCallback,
             )
           : PlayerControls(
               controller: _videoPlayerController!,
@@ -107,13 +105,7 @@ class PlayerViewState extends State<PlayerView> {
               onPlayPressed: onPlayPressedCallback,
             );
 
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController!,
-        autoPlay: widget.autoPlay || _wasPlaying,
-        looping: false,
-        allowedScreenSleep: false,
-        customControls: customControls,
-      );
+      _controls = customControls;
 
       if (!_shouldRestoreState && widget.autoPlay) {
         await _videoPlayerController!.play();
@@ -138,10 +130,9 @@ class PlayerViewState extends State<PlayerView> {
   }
 
   void _disposeControllers() {
-    _chewieController?.dispose();
     _videoPlayerController?.dispose();
-    _chewieController = null;
     _videoPlayerController = null;
+    _controls = null;
   }
 
   @override
@@ -152,7 +143,7 @@ class PlayerViewState extends State<PlayerView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isInitializing || _chewieController == null) {
+    if (_isInitializing || _videoPlayerController == null) {
       return const Center(child: CircularProgressIndicator(color: _kPrimary));
     }
 
@@ -212,8 +203,15 @@ class PlayerViewState extends State<PlayerView> {
           );
         },
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            Chewie(controller: _chewieController!),
+            Center(
+              child: AspectRatio(
+                aspectRatio: _videoPlayerController!.value.aspectRatio,
+                child: VideoPlayer(_videoPlayerController!),
+              ),
+            ),
+            if (_controls != null) _controls!,
             ValueListenableBuilder<VideoPlayerValue>(
               valueListenable: _videoPlayerController!,
               builder: (context, value, _) {
