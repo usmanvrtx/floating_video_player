@@ -4,8 +4,9 @@ description: >
   picture-in-picture mini-player with snap-to-corner physics, portrait/landscape
   orientation handling, spring-physics drag gestures, and a customisable controls
   layer built on top of video_player.
-version: 0.2.0
+version: 0.2.1
 homepage: https://github.com/usmanvrtx/floatube_player
+repository: https://github.com/usmanvrtx/floatube_player
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
