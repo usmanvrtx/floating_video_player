@@ -1,3 +1,12 @@
+## 0.2.0
+
+* **New: External VideoPlayerController support** — `VideoSource.controller()` factory lets you wrap and manage your own `VideoPlayerController` externally. The player won't dispose it when closed, letting you retain full control over playback.
+* **New: Streamlined controller API** — added read-only getters for `state`, `isPlaying`, `currentPosition`, `duration`, and `videoPlayerController` via `context.floatingController`.
+* **New: seekTo() method** — directly seek to any position via the controller.
+* **Improved: Simplified internal methods** — `play()` and `pause()` now delegate through the single `videoPlayerController` getter.
+* **Breaking: Cleaner public exports** — removed `PlayerView`, `PlayerViewState`, `PlayerAnimationMixin`, and `OverlayStackManager` from the barrel export. These are internal implementation details; use `FloatingViewController` and `FloatingPlayerView` as the public API.
+* **Documentation: Comprehensive README updates** — added API reference tables, new usage examples for external controllers, and clearer guidance on viewport constraints and back-button handling.
+
 ## 0.1.2
 
 * Fix demo GIFs to display properly on pub.dev by using GitHub raw URLs.

@@ -77,7 +77,7 @@ class ViewportInsets {
 /// ```
 class FloatingViewController {
   OverlayEntry? _entry;
-  GlobalKey<FloatingPlayerViewState>? floatingViewKey;
+  GlobalKey<FloatingPlayerViewState>? _floatingViewKey;
   Future<void>? _orientationTransition;
 
   final ValueNotifier<FloatingState> floatingState = ValueNotifier(
@@ -144,6 +144,34 @@ class FloatingViewController {
     this.customControlsBuilder,
   }) : viewportInsets = initialInsets;
 
+  // ── Public read-only accessors ────────────────────────────────────────────
+
+  /// The current display state of the floating player.
+  ///
+  /// Subscribe to [floatingState] for reactive updates.
+  FloatingState get state => floatingState.value;
+
+  /// The underlying [VideoPlayerController] of the currently active player.
+  ///
+  /// Returns `null` when no player is open or the video is still initialising.
+  VideoPlayerController? get videoPlayerController =>
+      _floatingViewKey?.currentState?.videoPlayerController;
+
+  /// Whether the current video is actively playing.
+  bool get isPlaying => videoPlayerController?.value.isPlaying ?? false;
+
+  /// The current playback position.
+  ///
+  /// Returns [Duration.zero] if no player is open.
+  Duration get currentPosition =>
+      videoPlayerController?.value.position ?? Duration.zero;
+
+  /// The total duration of the active video.
+  ///
+  /// Returns [Duration.zero] if the video is not yet initialised.
+  Duration get duration =>
+      videoPlayerController?.value.duration ?? Duration.zero;
+
   // ── Runtime constraint update ─────────────────────────────────────────────
 
   /// Updates the viewport insets that bound the mini-player's snap region.
@@ -166,7 +194,7 @@ class FloatingViewController {
   void updateConstraints(ViewportInsets insets) {
     if (viewportInsets == insets) return;
     viewportInsets = insets;
-    floatingViewKey?.currentState?.reapplyConstraints();
+    _floatingViewKey?.currentState?.reapplyConstraints();
   }
 
   /// Opens a new floating player overlay.
@@ -183,13 +211,13 @@ class FloatingViewController {
 
     close();
 
-    floatingViewKey = GlobalKey<FloatingPlayerViewState>();
+    _floatingViewKey = GlobalKey<FloatingPlayerViewState>();
 
     _entry = OverlayEntry(
       builder: (_) {
         return _FadeInWrapper(
           duration: const Duration(milliseconds: 350),
-          child: viewBuilder(floatingViewKey!),
+          child: viewBuilder(_floatingViewKey!),
         );
       },
     );
@@ -248,35 +276,38 @@ class FloatingViewController {
 
   /// Closes and removes the floating overlay entirely.
   void close() {
-    floatingViewKey?.currentState?.detachRouteFromContext();
+    _floatingViewKey?.currentState?.detachRouteFromContext();
 
     floatingState.value = FloatingState.closed;
     _entry?.remove();
     _entry?.dispose();
     _entry = null;
-    floatingViewKey = null;
+    _floatingViewKey = null;
   }
 
   /// Restores a collapsed mini-player to full expanded view.
   void expand() {
-    floatingViewKey?.currentState?.enterExpandedView();
+    _floatingViewKey?.currentState?.enterExpandedView();
   }
 
   /// Collapses the expanded player to the mini-player corner.
   void collapse() {
-    floatingViewKey?.currentState?.enterCollapsedView();
+    _floatingViewKey?.currentState?.enterCollapsedView();
   }
 
   /// Plays the current video.
   void play() {
-    floatingViewKey?.currentState?.playerKey.currentState?.videoPlayerController
-        ?.play();
+    videoPlayerController?.play();
   }
 
-  /// Pauses the current video. Delegates to the player state.
+  /// Pauses the current video.
   void pause() {
-    floatingViewKey?.currentState?.playerKey.currentState?.videoPlayerController
-        ?.pause();
+    videoPlayerController?.pause();
+  }
+
+  /// Seeks the current video to [position].
+  void seekTo(Duration position) {
+    videoPlayerController?.seekTo(position);
   }
 }
 

@@ -30,7 +30,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
   bool _collapseAnimationComplete = false;
 
   bool get _shouldAutoPlayPlayer {
-    final controller = playerKey.currentState?.videoPlayerController;
+    final controller = _playerKey.currentState?.videoPlayerController;
     if (controller == null || !controller.value.isInitialized) return true;
     return controller.value.isPlaying;
   }
@@ -72,7 +72,13 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
     }
   }
 
-  final GlobalKey<PlayerViewState> playerKey = GlobalKey<PlayerViewState>();
+  final GlobalKey<PlayerViewState> _playerKey = GlobalKey<PlayerViewState>();
+
+  /// The underlying [VideoPlayerController] of the active video.
+  ///
+  /// Returns `null` while the video is still initialising.
+  VideoPlayerController? get videoPlayerController =>
+      _playerKey.currentState?.videoPlayerController;
 
   void _slideAnimation() {
     if (_showSlideAnimation) {
@@ -118,7 +124,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
             return Material(
               color: Colors.black,
               child: PlayerView(
-                key: playerKey,
+                key: _playerKey,
                 source: widget.source,
                 autoPlay: _shouldAutoPlayPlayer,
                 floatingState: context.floatingController.floatingState,
@@ -199,7 +205,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
                 width: width,
                 height: finalHeight,
                 child: PlayerView(
-                  key: playerKey,
+                  key: _playerKey,
                   source: widget.source,
                   autoPlay: _shouldAutoPlayPlayer,
                   floatingState: context.floatingController.floatingState,
@@ -214,7 +220,7 @@ class FloatingPlayerViewState extends State<FloatingPlayerView>
   }
 
   List<Widget> _collapsedControls() {
-    final controller = playerKey.currentState?.videoPlayerController;
+    final controller = _playerKey.currentState?.videoPlayerController;
     if (controller == null) return [];
 
     return [
