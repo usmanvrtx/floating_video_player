@@ -9,6 +9,7 @@ import 'package:video_player/video_player.dart';
 /// - [VideoSource.file] — play a local [File]
 /// - [VideoSource.asset] — play a bundled Flutter asset
 /// - [VideoSource.contentUri] — play from an Android content URI
+/// - [VideoSource.controller] — wrap an existing [VideoPlayerController]
 sealed class VideoSource {
   const VideoSource._();
 
@@ -25,13 +26,49 @@ sealed class VideoSource {
   /// (e.g. from a media picker).
   const factory VideoSource.contentUri(Uri uri) = _ContentUriSource;
 
-  /// Creates the appropriate [VideoPlayerController] for this source.
+  /// Wraps an existing [VideoPlayerController] that is managed externally.
+  ///
+  /// The player will **not** dispose this controller when closed — the caller
+  /// is responsible for its lifecycle. This lets you retain full control over
+  /// playback, seek, speed, and other settings from outside the player.
+  ///
+  /// The controller may already be initialized before being passed in, or not.
+  /// If not yet initialized, the player will call
+  /// [VideoPlayerController.initialize] automatically.
+  ///
+  /// ```dart
+  /// final myController = VideoPlayerController.networkUrl(Uri.parse('...'));
+  /// await myController.initialize();
+  ///
+  /// context.floatingController.open(
+  ///   context,
+  ///   (key) => FloatingPlayerView(
+  ///     key: key,
+  ///     source: VideoSource.controller(myController),
+  ///   ),
+  /// );
+  ///
+  /// // Control playback from anywhere:
+  /// myController.setPlaybackSpeed(1.5);
+  /// myController.seekTo(const Duration(seconds: 30));
+  /// ```
+  factory VideoSource.controller(VideoPlayerController controller) =
+      _ControllerSource;
+
+  /// Whether this source wraps an externally-managed [VideoPlayerController].
+  ///
+  /// When `true`, the player will **not** call [VideoPlayerController.dispose]
+  /// on close — lifecycle management remains the caller's responsibility.
+  bool get isExternal => false;
+
+  /// Creates or returns the [VideoPlayerController] for this source.
   VideoPlayerController toController() => switch (this) {
         _NetworkSource(:final url) =>
           VideoPlayerController.networkUrl(Uri.parse(url)),
         _FileSource(:final file) => VideoPlayerController.file(file),
         _AssetSource(:final path) => VideoPlayerController.asset(path),
         _ContentUriSource(:final uri) => VideoPlayerController.contentUri(uri),
+        _ControllerSource(:final controller) => controller,
       };
 }
 
@@ -83,4 +120,21 @@ final class _ContentUriSource extends VideoSource {
 
   @override
   int get hashCode => Object.hash('contentUri', uri);
+}
+
+final class _ControllerSource extends VideoSource {
+  final VideoPlayerController controller;
+
+  // ignore: prefer_const_constructors_in_immutables
+  _ControllerSource(this.controller) : super._();
+
+  @override
+  bool get isExternal => true;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _ControllerSource && identical(other.controller, controller);
+
+  @override
+  int get hashCode => Object.hash('controller', identityHashCode(controller));
 }

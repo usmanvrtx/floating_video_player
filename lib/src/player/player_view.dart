@@ -81,7 +81,11 @@ class PlayerViewState extends State<PlayerView> {
     try {
       _videoPlayerController = widget.source!.toController();
 
-      await _videoPlayerController!.initialize();
+      // External controllers may already be initialized by the caller.
+      // Skip initialization if so to avoid interrupting active playback.
+      if (!_videoPlayerController!.value.isInitialized) {
+        await _videoPlayerController!.initialize();
+      }
 
       void onPlayPressedCallback() {
         if (_videoPlayerController!.value.isPlaying) {
@@ -107,19 +111,24 @@ class PlayerViewState extends State<PlayerView> {
 
       _controls = customControls;
 
-      if (!_shouldRestoreState && widget.autoPlay) {
-        await _videoPlayerController!.play();
-      }
-
-      if (_shouldRestoreState) {
-        if (_currentPosition != Duration.zero) {
-          await _videoPlayerController!.seekTo(_currentPosition);
-        }
-        if (_wasPlaying) {
+      // External controllers own their playback state — skip autoPlay and
+      // state-restore so the caller remains in full control.
+      if (!widget.source!.isExternal) {
+        if (!_shouldRestoreState && widget.autoPlay) {
           await _videoPlayerController!.play();
         }
-        _shouldRestoreState = false;
+
+        if (_shouldRestoreState) {
+          if (_currentPosition != Duration.zero) {
+            await _videoPlayerController!.seekTo(_currentPosition);
+          }
+          if (_wasPlaying) {
+            await _videoPlayerController!.play();
+          }
+        }
       }
+
+      _shouldRestoreState = false;
     } catch (_) {
       // Initialisation failed – the loading indicator remains visible.
     } finally {
@@ -130,7 +139,10 @@ class PlayerViewState extends State<PlayerView> {
   }
 
   void _disposeControllers() {
-    _videoPlayerController?.dispose();
+    // External controllers are owned by the caller – never dispose them here.
+    if (widget.source?.isExternal != true) {
+      _videoPlayerController?.dispose();
+    }
     _videoPlayerController = null;
     _controls = null;
   }
